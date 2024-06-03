@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { ethers } from 'ethers';
+import { ethers } from "ethers";
 
 // Define the ProcessedData type
 export interface ProcessedData {
@@ -14,38 +14,38 @@ export interface ProcessedData {
 const perpsMarketProxyABI = [
   {
     constant: true,
-    inputs: [{ name: '_accountId', type: 'uint128' }],
-    name: 'getAccountOwner',
-    outputs: [{ name: '', type: 'address' }],
+    inputs: [{ name: "_accountId", type: "uint128" }],
+    name: "getAccountOwner",
+    outputs: [{ name: "", type: "address" }],
     payable: false,
-    stateMutability: 'view',
-    type: 'function',
+    stateMutability: "view",
+    type: "function",
   },
 ];
-const perpsMarketProxyAddress = '0x0A2AF931eFFd34b81ebcc57E3d3c9B1E1dE1C9Ce'; // base mainnet
+const perpsMarketProxyAddress = "0x0A2AF931eFFd34b81ebcc57E3d3c9B1E1dE1C9Ce"; // base mainnet
 
-const multicallAddress = '0xcA11bde05977b3631167028862bE2a173976CA11';
+const multicallAddress = "0xcA11bde05977b3631167028862bE2a173976CA11";
 const multicallABI = [
   {
     constant: true,
     inputs: [
       {
         components: [
-          { name: 'target', type: 'address' },
-          { name: 'callData', type: 'bytes' },
+          { name: "target", type: "address" },
+          { name: "callData", type: "bytes" },
         ],
-        name: 'calls',
-        type: 'tuple[]',
+        name: "calls",
+        type: "tuple[]",
       },
     ],
-    name: 'aggregate',
+    name: "aggregate",
     outputs: [
-      { name: 'blockNumber', type: 'uint256' },
-      { name: 'returnData', type: 'bytes[]' },
+      { name: "blockNumber", type: "uint256" },
+      { name: "returnData", type: "bytes[]" },
     ],
     payable: false,
-    stateMutability: 'view',
-    type: 'function',
+    stateMutability: "view",
+    type: "function",
   },
 ];
 
@@ -77,7 +77,7 @@ export const processData = async (
     const calls = accountIds.map((accountId) => ({
       target: perpsMarketProxyAddress,
       callData: perpsMarketProxy.interface.encodeFunctionData(
-        'getAccountOwner',
+        "getAccountOwner",
         [accountId]
       ),
     }));
@@ -87,13 +87,13 @@ export const processData = async (
     accountIds.forEach((accountId, index) => {
       try {
         const [owner] = perpsMarketProxy.interface.decodeFunctionResult(
-          'getAccountOwner',
+          "getAccountOwner",
           returnData[index]
         );
         accountOwnerCache[accountId] = owner;
       } catch (error) {
         console.error(`Error decoding owner for account ${accountId}:`, error);
-        accountOwnerCache[accountId] = 'Unknown';
+        accountOwnerCache[accountId] = "Unknown";
       }
     });
   };

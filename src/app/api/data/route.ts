@@ -2,17 +2,14 @@
 /* eslint-disable no-console */
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
-import pool from '../../db';
+import pool from "../../db";
 
 export const GET = async (req: any) => {
   try {
     const { searchParams } = new URL(req.url);
-    const startDate = searchParams.get('startDate');
-    const endDate = searchParams.get('endDate');
-    console.log('STARTDATE', startDate);
-    console.log('ENDDATE', endDate);
+    const startDate = searchParams.get("startDate");
     const client = await pool.connect();
     const query = `
       SELECT
@@ -22,8 +19,7 @@ export const GET = async (req: any) => {
       FROM
         base_mainnet.fct_perp_trades
       WHERE
-        ts >= '${startDate}' AND
-        ts <= '${endDate}'
+        ts >= '${startDate}'
       GROUP BY 1, 2
       ORDER BY 1 DESC, 3 DESC
       LIMIT 1000
@@ -32,13 +28,12 @@ export const GET = async (req: any) => {
     client.release();
 
     const response = NextResponse.json(result.rows, { status: 200 });
-    response.headers.set('Cache-Control', 'no-store');
+    response.headers.set("Cache-Control", "no-store");
     return response;
   } catch (err) {
-    console.log('hailo');
     console.error(err);
     return NextResponse.json(
-      { error: 'Internal Server Error' },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }

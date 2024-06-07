@@ -5,10 +5,10 @@ import { ethers } from "ethers";
 export interface ProcessedData {
   processedData: {
     walletAddress: string;
-    feesPaid: number;
-    estimatedDistribution: number;
+    tradeCount: number;
+    snaxBalance: number;
   };
-  totalSnxDistribution: number;
+  totalSnaxEarned: number;
 }
 
 const perpsMarketProxyABI = [
@@ -65,11 +65,10 @@ interface FetchedData {
   exchange_fees: number;
 }
 
-const FEE_PERCENTAGE = 0.9;
+const FEE_MULTIPLIER = 0.2192;
 
 export const processData = async (
-  fetchedData: FetchedData[],
-  snxPrice: number
+  fetchedData: FetchedData[]
 ): Promise<object> => {
   const accountOwnerCache: { [accountId: string]: string } = {};
 
@@ -104,26 +103,26 @@ export const processData = async (
 
   const walletData: {
     [walletAddress: string]: {
-      feesPaid: number;
-      estimatedDistribution: number;
+      tradeCount: number;
+      snaxBalance: number;
     };
   } = {};
 
-  let totalSnxDistribution = 0;
+  let totalSnaxEarned = 0;
   fetchedData.forEach((data) => {
     const walletAddress = accountOwnerCache[data.account_id];
     const exchangeFees = Number(data.exchange_fees);
 
     if (!walletData[walletAddress]) {
-      walletData[walletAddress] = { feesPaid: 0, estimatedDistribution: 0 };
+      walletData[walletAddress] = { tradeCount: 0, snaxBalance: 0 };
     }
 
     if (!Number.isNaN(exchangeFees)) {
-      walletData[walletAddress].feesPaid += exchangeFees;
-      const estimatedFeeDistribution = exchangeFees * FEE_PERCENTAGE;
-      const snxDistribution = estimatedFeeDistribution / snxPrice;
-      totalSnxDistribution += snxDistribution;
-      walletData[walletAddress].estimatedDistribution += snxDistribution;
+      walletData[walletAddress].tradeCount++;
+      const estimatedSnaxDistribution = exchangeFees * FEE_MULTIPLIER;
+      const snaxDistribution = estimatedSnaxDistribution;
+      totalSnaxEarned += snaxDistribution;
+      walletData[walletAddress].snaxBalance += snaxDistribution;
     } else {
       console.error(
         `Invalid exchange fee for account ${data.account_id}:`,
@@ -135,9 +134,9 @@ export const processData = async (
   return {
     processedData: Object.keys(walletData).map((walletAddress) => ({
       walletAddress,
-      feesPaid: walletData[walletAddress].feesPaid,
-      estimatedDistribution: walletData[walletAddress].estimatedDistribution,
+      tradeCount: walletData[walletAddress].tradeCount,
+      snaxBalance: walletData[walletAddress].snaxBalance,
     })),
-    totalSnxDistribution,
+    totalSnaxEarned,
   };
 };

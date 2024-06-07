@@ -10,17 +10,12 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
-  Select,
   Heading,
   Text,
-  Link,
   CircularProgress,
   CircularProgressLabel,
-  Progress,
   Spinner,
 } from "@chakra-ui/react";
-import { addWeeks, format, isBefore } from "date-fns";
-import type { ChangeEvent } from "react";
 import { useEffect, useState } from "react";
 
 import "@rainbow-me/rainbowkit/styles.css";
@@ -34,40 +29,7 @@ import { config } from "~/lib/config/wagmi";
 import { DataTable } from "~/lib/components/DataTable";
 import { processData } from "~/lib/utils/processData";
 
-// Helper function to format dates
-const formatDate = (date: Date): string =>
-  format(date, "yyyy-MM-dd'T'HH:mm:ssXXX");
-
-// Function to generate weeks array
-const generateWeeks = (startDate: Date, numberOfWeeks: number) => {
-  const weeksArray = [];
-  // eslint-disable-next-line no-plusplus
-  for (let i = 0; i < numberOfWeeks; i++) {
-    const startOfWeekDate = addWeeks(startDate, i); // startOfWeek sets week start to Wednesday
-    const endOfWeekDate = addWeeks(startDate, i + 1); // endOfWeek sets week end to Tuesday
-    weeksArray.push({
-      start: formatDate(startOfWeekDate),
-      end: formatDate(endOfWeekDate),
-    });
-  }
-  return weeksArray;
-};
-
-// Initial start date
 const initialStartDate = new Date(Date.UTC(2024, 0, 1, 20, 0, 0));
-
-// Generate 52 weeks
-const weeks = generateWeeks(initialStartDate, 52);
-
-// Filter out weeks that start later than the current time
-const now = new Date();
-const filteredWeeks = weeks
-  .filter((week) => {
-    const startOfWeekDate = new Date(week.start);
-    return isBefore(startOfWeekDate, now);
-  })
-  .reverse();
-
 const queryClient = new QueryClient();
 
 const Home = () => {
@@ -75,46 +37,26 @@ const Home = () => {
   const [filteredTableData, setFilteredTableData] = useState<any>([]);
   const [filter, setFilter] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
-  const [weeklySnxTotal, setWeeklySnxTotal] = useState<number>(0);
-  const [selectedWeek, setSelectedWeek] = useState<number>(0);
-  const [snxPrice, setSnxPrice] = useState(2.5);
-
-  useEffect(() => {
-    const fetchPrice = async () => {
-      const response = await fetch(
-        "https://api.coingecko.com/api/v3/simple/price?ids=havven&vs_currencies=usd",
-      );
-      const data = await response.json();
-      setSnxPrice(data.havven.usd);
-    };
-
-    fetchPrice();
-  }, []);
+  const [streakCount, setStreakCount] = useState<number>(0);
+  const [multiplierFactor, setMultiplierFactor] = useState<number>(1);
+  const [snaxBalance, setSnaxBalance] = useState<number>(0);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!filteredWeeks[selectedWeek] || !snxPrice) {
-        setLoading(false);
-        return;
-      }
       try {
         setLoading(true);
         const url = new URL("/api/data", window.location.origin);
-        const startDate = new Date(
-          filteredWeeks[selectedWeek].start,
-        ).toISOString();
-        const endDate = new Date(filteredWeeks[selectedWeek].end).toISOString();
-        url.searchParams.append("startDate", startDate);
-        url.searchParams.append("endDate", endDate);
+        url.searchParams.append("startDate", initialStartDate.toISOString());
 
         const response = await fetch(url.toString());
         const data = await response.json();
-        const { processedData, totalSnxDistribution } = (await processData(
+        const { processedData, totalSnaxEarned } = (await processData(
           data,
-          snxPrice,
         )) as any;
         setTableData(processedData);
-        setWeeklySnxTotal(Math.floor(totalSnxDistribution));
+        setStreakCount(Math.floor(streakCount));
+        setMultiplierFactor(Math.floor(1));
+        setSnaxBalance(Math.floor(totalSnaxEarned));
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -122,7 +64,7 @@ const Home = () => {
     };
 
     fetchData();
-  }, [selectedWeek, snxPrice]);
+  }, []);
 
   useEffect(() => {
     setFilteredTableData(
@@ -165,31 +107,19 @@ const Home = () => {
               >
                 <Box my="auto">
                   <Heading size="md" fontWeight="semibold" mb={3}>
-                    Hungry? Try SNAX.
+                    Hungry? Try some SNAX, degen.
                   </Heading>
-                    <Text mb={6}>
-                      SNAX is a new points system on Base. Trade on a Synthetix-powered exchange, provide liquidity to a permissionless pool, or spread the word on social media to earn some!
+                    <Text mb={3}>
+                      SNAX is a new points system on Base. Earn some by trading on a Synthetix-powered exchange, providing liquidity to the Spartan Council pool, or spreading the word on social media.
                     </Text>
-                  <Text fontSize={14}>
-                  <Link
-                      _hover={{ textDecor: "none", borderColor: "gray.500" }}
-                      borderBottom="1px solid"
-                      borderColor="gray.600"
-                      href="https://v3.synthetix.io"
-                    >
-                       Synthetix
-                    </Link>{" "}
-                     is an open and permissionless liquidity protocol that provides derivatives like
-                    perpetual futures, options, parimutuel markets, and more
-                    across EVM chains.
-                  </Text>
+                    <Text>Connect your wallet to view your SNAX stats.</Text>
                 </Box>
               </Flex>
             </Flex>
 
-
+            {/* // stats boxes */}
             <Flex gap={6} direction={["column", "column", "row"]}>
-              {/* // estimated daily SNX */}
+              {/* // streak count */}
               <Box
                 color="gray.300"
                 bg="black"
@@ -212,11 +142,10 @@ const Home = () => {
                       <Text
                         fontSize="md"
                         fontWeight="medium"
-                        textTransform="uppercase"
                         opacity={loading ? 0 : 1}
                         transition="opacity 0.33s"
                       >
-                        0 SNAX
+                        {38} Trades
                       </Text>
                       <Text
                         fontSize="xs"
@@ -225,7 +154,7 @@ const Home = () => {
                         opacity={loading ? 0 : 1}
                         transition="opacity 0.33s"
                       >
-                        Est. Daily SNAX
+                        Trade Count
                       </Text>
                     </CircularProgressLabel>
                   </CircularProgress>
@@ -255,11 +184,11 @@ const Home = () => {
                       <Text
                         fontSize="md"
                         fontWeight="medium"
-                        textTransform="uppercase"
+                        textTransform="lowercase"
                         opacity={loading ? 0 : 1}
                         transition="opacity 0.33s"
                       >
-                        0.00x
+                        {multiplierFactor.toFixed(2)}x
                       </Text>
                       <Text
                         fontSize="xs"
@@ -302,7 +231,7 @@ const Home = () => {
                         opacity={loading ? 0 : 1}
                         transition="opacity 0.33s"
                       >
-                        0 SNAX
+                        {snaxBalance.toLocaleString()} SNAX
                       </Text>
                       <Text
                         fontSize="xs"
@@ -319,7 +248,7 @@ const Home = () => {
               </Box>
             </Flex>
 
-            {/* <Flex w="100%" gap={6} direction={["column", "column", "row"]}>
+            <Flex w="100%" gap={6} direction={["column", "column", "row"]}>
               <InputGroup size="sm" bg="black">
                 <InputLeftElement pointerEvents="none">
                   <SearchIcon color="gray.500" />
@@ -333,26 +262,6 @@ const Home = () => {
                   }
                 />
               </InputGroup>
-
-              <Box ml={[0, 0, "auto"]} minWidth={["none", "none", "200px"]}>
-                <Select
-                  size="sm"
-                  bg="black"
-                  value={selectedWeek}
-                  onChange={(event: ChangeEvent<HTMLSelectElement>) =>
-                    setSelectedWeek(Number(event.target.value))
-                  }
-                >
-                  {filteredWeeks.map((week, ind) => {
-                    return (
-                      <option value={ind}>
-                        Week {filteredWeeks.length - ind} (
-                        {format(week.start, "M/d")} - {format(week.end, "M/d")})
-                      </option>
-                    );
-                  })}
-                </Select>
-              </Box>
             </Flex>
 
             <Box
@@ -368,9 +277,9 @@ const Home = () => {
                   <Spinner m="auto" size="xl" color="#00D1FF" />
                 </Flex>
               ) : (
-                <DataTable data={filteredTableData} price={snxPrice} />
+                <DataTable data={filteredTableData} />
               )}
-            </Box> */}
+            </Box>
           </Flex>
         </RainbowKitProvider>
       </QueryClientProvider>

@@ -7,7 +7,6 @@ import {
   ChevronDownIcon,
   UpDownIcon,
   ExternalLinkIcon,
-  InfoOutlineIcon,
 } from '@chakra-ui/icons';
 import {
   Table,
@@ -19,7 +18,6 @@ import {
   chakra,
   Link,
   Code,
-  Tooltip,
 } from '@chakra-ui/react';
 import type { SortingState } from '@tanstack/react-table';
 import {
@@ -36,11 +34,11 @@ export type DataTableProps<Data extends object> = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function DataTable({ data, price }: any) {
+export function DataTable({ data }: any) {
   type TableRowData = {
     walletAddress: string;
-    feesPaid: number;
-    estimatedDistribution: number;
+    tradeCount: number;
+    snaxBalance: number;
   };
 
   const columnHelper = createColumnHelper<TableRowData>();
@@ -50,18 +48,18 @@ export function DataTable({ data, price }: any) {
       cell: (info) => info.getValue(),
       header: 'Wallet Address',
     }),
-    columnHelper.accessor('feesPaid', {
-      cell: (info) => Number(info.getValue()).toFixed(2),
-      header: 'Fees Paid',
+    columnHelper.accessor('tradeCount', {
+      cell: (info) => Number(info.getValue()),
+      header: 'Trade Count',
     }),
-    columnHelper.accessor('estimatedDistribution', {
+    columnHelper.accessor('snaxBalance', {
       cell: (info) => Number(info.getValue()).toFixed(2),
-      header: 'Estimated Distribution',
+      header: 'SNAX Balance',
     }),
   ];
 
   const [sorting, setSorting] = React.useState<SortingState>([
-    { id: 'estimatedDistribution', desc: true },
+    { id: 'snaxBalance', desc: true },
   ]);
   const table = useReactTable({
     columns,
@@ -92,13 +90,6 @@ export function DataTable({ data, price }: any) {
                   {flexRender(
                     header.column.columnDef.header,
                     header.getContext()
-                  )}
-                  {header.column.id === 'estimatedDistribution' && (
-                    <Tooltip
-                      label={`This is based on an SNX price of $${price}`}
-                    >
-                      <InfoOutlineIcon transform="translateY(-0.5px)" ml={1} />
-                    </Tooltip>
                   )}
                   <chakra.span pl="1">
                     {header.column.getIsSorted() ? (
@@ -161,13 +152,13 @@ export function DataTable({ data, price }: any) {
                     (cell.getContext().getValue() as number).toLocaleString(
                       undefined,
                       {
-                        minimumFractionDigits: 2,
+                        minimumFractionDigits: 0,
                         maximumFractionDigits: 2,
                       }
                     )
                   )}
-                  {cell.column.id === 'feesPaid' && ' USDC'}
-                  {cell.column.id === 'estimatedDistribution' && ' SNX'}
+                  {cell.column.id === 'tradeCount' && ' Trades'}
+                  {cell.column.id === 'snaxBalance' && ' SNAX'}
                 </Td>
               );
             })}

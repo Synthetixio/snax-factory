@@ -1,4 +1,4 @@
-import { Image, Flex } from '@chakra-ui/react';
+import { Flex, Image } from '@chakra-ui/react';
 
 const Header = () => {
   return (
@@ -10,7 +10,7 @@ const Header = () => {
     >
       <Flex direction={['column', 'row']} gap={3.5}>
         <Flex mx={['auto', 'none']}>
-        <Image src="/neon.png" alt="SNAX Factory" height="200px" />
+          <Image src="/snax_neon.svg" alt="SNAX Factory" height="200px" />
         </Flex>
       </Flex>
     </Flex>

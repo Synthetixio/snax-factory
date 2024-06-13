@@ -22,8 +22,7 @@ const Layout = ({ children }: LayoutProps) => {
         top={0}
         left={0}
         sx={{
-          'background-image': "url('/bg.svg') !important;",
-          'background-size': 'cover',
+          'background-image': "url('/neon.png')",
         }}
         opacity="0.066"
       />

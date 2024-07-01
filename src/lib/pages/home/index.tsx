@@ -99,7 +99,6 @@ const Home = () => {
             <Flex gap={6} direction={["column", "column", "row"]}>
               <Flex
                 color="gray.300"
-                bg="black"
                 border="1px solid"
                 borderColor="whiteAlpha.300"
                 p={6}
@@ -122,7 +121,6 @@ const Home = () => {
               {/* // streak count */}
               <Box
                 color="gray.300"
-                bg="black"
                 border="1px solid"
                 borderColor="whiteAlpha.300"
                 p={3}
@@ -164,7 +162,6 @@ const Home = () => {
               {/* // multiplier */}
               <Box
                 color="gray.300"
-                bg="black"
                 border="1px solid"
                 borderColor="whiteAlpha.300"
                 p={3}
@@ -207,7 +204,6 @@ const Home = () => {
               {/* // SNAX balance */}
               <Box
                 color="gray.300"
-                bg="black"
                 border="1px solid"
                 borderColor="whiteAlpha.300"
                 p={3}
@@ -249,7 +245,7 @@ const Home = () => {
             </Flex>
 
             <Flex w="100%" gap={6} direction={["column", "column", "row"]}>
-              <InputGroup size="sm" bg="black">
+              <InputGroup size="sm">
                 <InputLeftElement pointerEvents="none">
                   <SearchIcon color="gray.500" />
                 </InputLeftElement>
@@ -266,7 +262,6 @@ const Home = () => {
 
             <Box
               color="gray.300"
-              bg="black"
               border="1px solid"
               borderColor="whiteAlpha.300"
               borderRadius="md"

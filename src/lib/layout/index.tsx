@@ -22,9 +22,9 @@ const Layout = ({ children }: LayoutProps) => {
         top={0}
         left={0}
         sx={{
-          'background-image': "url('/neon.png')",
+          'background-color': "#06061B",
         }}
-        opacity="0.066"
+        opacity="1.0"
       />
       <Box margin="0 auto" maxWidth={800} transition="0.5s ease-out">
         <Box my={24} px={4}>

@@ -10,7 +10,7 @@ const Header = () => {
     >
       <Flex direction={['column', 'row']} gap={3.5}>
         <Flex mx={['auto', 'none']}>
-          <Image src="/snax_neon.svg" alt="SNAX Factory" height="200px" />
+          <Image src="/neon-sign.gif" alt="SNAX Factory" />
         </Flex>
       </Flex>
     </Flex>
